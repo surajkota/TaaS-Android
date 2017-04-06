@@ -1,0 +1,52 @@
+{
+    "duration" : 90,
+    "medication" :
+    [
+        {
+            "medicineId" : "AE8934BC",
+            "timeThreshold" :["10:00AM", "3:00PM", "10:00PM"],
+            "quantity" : 1,
+            "procedure" : "Mix in 200ml warm water and drink",
+            "frequency" : 2,
+            "startDay" : 1,
+            "endDay" : 90
+        },
+        {
+            "medicineId" : "ASDF92AV",
+            "timeThreshold" :["10:00AM", "10:00PM"],
+            "quantity" : 1,
+            "procedure" : "Swallow without biting. Drink warm water if needed",
+            "frequency" : 1,
+            "startDay" : 1,
+            "endDay" : 10
+        }
+    ],
+    "restrictedFood":
+    [
+        {
+            "foodId" : "OIREW342AS",
+            "startDay" : 1,
+            "endDay" : 10
+        },
+        {
+            "foodId" : "LSADFW93AG",
+            "startDay" : 30,
+            "endDay" : 90
+        }
+    ],
+    "dangerSigns" :
+    [
+        {
+            "symptom": "Lips/finger nails turning blue",
+            "whenToAlert": [5,20] 
+        },
+        {
+            "symptom": "Going out of breath while walking",
+            "whenToAlert": [2]
+        }
+    ],
+    "sleep" : {
+        "minThreshold": 6,
+        "maxThreshold": 8
+    }
+}
