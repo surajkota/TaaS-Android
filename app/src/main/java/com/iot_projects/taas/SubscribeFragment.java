@@ -4,9 +4,14 @@ import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iot_projects.taas.databinding.SubscribePageBinding;
@@ -20,16 +25,16 @@ import java.util.List;
  * Created by Kartikk on 4/9/2017.
  */
 
-public class SubscribeActivity extends AppCompatActivity {
+public class SubscribeFragment extends Fragment {
 
     SubscribePageBinding subscribePageBinding;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        subscribePageBinding = DataBindingUtil.setContentView(this, R.layout.subscribe_page);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        subscribePageBinding = DataBindingUtil.inflate(inflater, R.layout.subscribe_page, container, false);
         RecyclerView recyclerView = subscribePageBinding.subscribeRecyclerView;
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         List<Treatment> treatmentList = new ArrayList<>();
         String treatmentString = "{\n" +
                 "    \"treatmentName\" : \"Treatment 1\",\n" +
@@ -89,13 +94,13 @@ public class SubscribeActivity extends AppCompatActivity {
             Treatment treatment = new ObjectMapper().readValue(treatmentString, Treatment.class);
             treatmentList.add(treatment);
             recyclerView.setAdapter(new SubscribeRecyclerAdapter(treatmentList));
-            SharedPreferences mSettings = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences mSettings = PreferenceManager.getDefaultSharedPreferences(getContext());
             SharedPreferences.Editor editor = mSettings.edit();
             editor.putString("treatmentString", treatmentString);
             editor.apply();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return subscribePageBinding.getRoot();
     }
-
 }

@@ -11,4 +11,8 @@
     <string name="danger_sign_label">Danger Signs</string>
     <string name="med_freq_part">times a day</string>
     <string name="bullet">\u2022</string>
+    <string name="subscriptions_side">Manage subscriptions</string>
+    <string name="user_side">User profile</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 </resources>
