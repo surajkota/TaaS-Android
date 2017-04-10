@@ -1,6 +1,7 @@
 
 package com.iot_projects.taas.models;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -15,14 +16,14 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "minThreshold",
     "maxThreshold"
 })
-public class Sleep {
+public class Sleep implements Serializable {
 
     @JsonProperty("minThreshold")
-    private Integer minThreshold;
+    public Integer minThreshold;
     @JsonProperty("maxThreshold")
-    private Integer maxThreshold;
+    public Integer maxThreshold;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    public Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("minThreshold")
     public Integer getMinThreshold() {

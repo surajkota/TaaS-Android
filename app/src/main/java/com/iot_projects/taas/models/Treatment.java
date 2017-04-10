@@ -1,9 +1,11 @@
 
 package com.iot_projects.taas.models;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -13,24 +15,38 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "duration",
-    "medication",
-    "restrictedFood",
-    "dangerSigns",
-    "sleep"
+        "treatmentName",
+        "duration",
+        "medication",
+        "restrictedFood",
+        "dangerSigns",
+        "sleep"
 })
-public class Treatment {
+public class Treatment implements Serializable {
 
     @JsonProperty("duration")
-    private Integer duration;
+    public Integer duration;
     @JsonProperty("medication")
-    private List<Medication> medication = null;
+    public List<Medication> medication = null;
     @JsonProperty("restrictedFood")
-    private List<RestrictedFood> restrictedFood = null;
+    public List<RestrictedFood> restrictedFood = null;
     @JsonProperty("dangerSigns")
-    private List<DangerSign> dangerSigns = null;
+    public List<DangerSign> dangerSigns = null;
     @JsonProperty("sleep")
-    private Sleep sleep;
+    public Sleep sleep;
+    @JsonProperty("treatmentName")
+    public String treatmentName;
+
+    @JsonProperty("treatmentName")
+    public String getTreatmentName() {
+        return treatmentName;
+    }
+
+    @JsonProperty("treatmentName")
+    public void setTreatmentName(String treatmentName) {
+        this.treatmentName = treatmentName;
+    }
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 

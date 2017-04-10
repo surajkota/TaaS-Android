@@ -1,6 +1,7 @@
 
 package com.iot_projects.taas.models;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -16,16 +17,16 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "startDay",
     "endDay"
 })
-public class RestrictedFood {
+public class RestrictedFood implements Serializable {
 
     @JsonProperty("foodId")
-    private String foodId;
+    public String foodId;
     @JsonProperty("startDay")
-    private Integer startDay;
+    public Integer startDay;
     @JsonProperty("endDay")
-    private Integer endDay;
+    public Integer endDay;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    public Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("foodId")
     public String getFoodId() {

@@ -1,6 +1,7 @@
 
 package com.iot_projects.taas.models;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,24 +22,24 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "startDay",
     "endDay"
 })
-public class Medication {
+public class Medication implements Serializable {
 
     @JsonProperty("medicineId")
-    private String medicineId;
+    public String medicineId;
     @JsonProperty("timeThreshold")
-    private List<String> timeThreshold = null;
+    public List<String> timeThreshold = null;
     @JsonProperty("quantity")
-    private Integer quantity;
+    public Integer quantity;
     @JsonProperty("procedure")
-    private String procedure;
+    public String procedure;
     @JsonProperty("frequency")
-    private Integer frequency;
+    public Integer frequency;
     @JsonProperty("startDay")
-    private Integer startDay;
+    public Integer startDay;
     @JsonProperty("endDay")
-    private Integer endDay;
+    public Integer endDay;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    public Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("medicineId")
     public String getMedicineId() {

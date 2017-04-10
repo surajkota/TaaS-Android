@@ -1,6 +1,9 @@
 
 package com.iot_projects.taas.models;
 
+import android.os.Parcelable;
+
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,14 +19,14 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "symptom",
     "whenToAlert"
 })
-public class DangerSign {
+public class DangerSign implements Serializable {
 
     @JsonProperty("symptom")
-    private String symptom;
+    public String symptom;
     @JsonProperty("whenToAlert")
-    private List<Integer> whenToAlert = null;
+    public List<Integer> whenToAlert = null;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    public Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("symptom")
     public String getSymptom() {
