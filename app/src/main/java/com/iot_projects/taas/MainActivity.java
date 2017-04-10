@@ -46,6 +46,16 @@ public class MainActivity extends AppCompatActivity {
         setupDrawerContent(activityMainBinding.navigationView);
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open,  R.string.drawer_close);
         drawerLayout.addDrawerListener(drawerToggle);
+        activityMainBinding.navigationView.getMenu().getItem(0).setChecked(true);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        try {
+            fragmentManager.beginTransaction().replace(R.id.frameLayout, TreatmentsFragment.class.newInstance()).commit();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
 
         checkLocBT();
         initializeBluetooth();
