@@ -72,6 +72,4 @@ class AsyncPost extends AsyncTask<Void,Void,Void> {
         }
         return null;
     }
-
-
 }

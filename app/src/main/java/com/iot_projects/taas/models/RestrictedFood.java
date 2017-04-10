@@ -67,4 +67,13 @@ public class RestrictedFood {
         this.additionalProperties.put(name, value);
     }
 
+    @Override
+    public String toString() {
+        return "RestrictedFood{" +
+                "foodId='" + foodId + '\'' +
+                ", startDay=" + startDay +
+                ", endDay=" + endDay +
+                ", additionalProperties=" + additionalProperties +
+                '}';
+    }
 }

@@ -54,4 +54,12 @@ public class Sleep {
         this.additionalProperties.put(name, value);
     }
 
+    @Override
+    public String toString() {
+        return "Sleep{" +
+                "minThreshold=" + minThreshold +
+                ", maxThreshold=" + maxThreshold +
+                ", additionalProperties=" + additionalProperties +
+                '}';
+    }
 }

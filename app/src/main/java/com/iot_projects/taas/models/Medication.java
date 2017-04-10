@@ -120,4 +120,17 @@ public class Medication {
         this.additionalProperties.put(name, value);
     }
 
+    @Override
+    public String toString() {
+        return "Medication{" +
+                "medicineId='" + medicineId + '\'' +
+                ", timeThreshold=" + timeThreshold +
+                ", quantity=" + quantity +
+                ", procedure='" + procedure + '\'' +
+                ", frequency=" + frequency +
+                ", startDay=" + startDay +
+                ", endDay=" + endDay +
+                ", additionalProperties=" + additionalProperties +
+                '}';
+    }
 }

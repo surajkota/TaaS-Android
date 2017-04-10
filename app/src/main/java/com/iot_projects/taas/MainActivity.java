@@ -3,9 +3,14 @@ package com.iot_projects.taas;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,12 +18,34 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iot_projects.taas.models.Medication;
+import com.iot_projects.taas.models.Treatment;
+
+import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView mTextMessage;
+    //private TextView mTextMessage;
+    private Button subscribeButton;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private static final int PERMISSION_REQUEST_COARSE_BL = 2;
 
@@ -29,13 +56,13 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
+                    //mTextMessage.setText(R.string.title_home);
                     return true;
                 case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
+                    //mTextMessage.setText(R.string.title_dashboard);
                     return true;
                 case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
+                    //mTextMessage.setText(R.string.title_notifications);
                     return true;
             }
             return false;
@@ -48,9 +75,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTextMessage = (TextView) findViewById(R.id.message);
+        //mTextMessage = (TextView) findViewById(R.id.message);
+        subscribeButton = (Button) findViewById(R.id.subscribeButton);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        subscribeButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Log.d("Debug", "Subscribe Button Clicked!");
+                AsyncGet asyncGet = new AsyncGet("http://192.168.0.10:8080/getTDL", MainActivity.this);
+                asyncGet.start();
+            }
+        });
 
         checkLocBT();
         initializeBluetooth();
@@ -130,5 +166,72 @@ public class MainActivity extends AppCompatActivity {
             }
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    public void installTDL() {
+        Treatment treatment = BackgroundService.subscription.getTreatment();
+        int intentId = 0;
+        Map<String,Map<Long, Boolean>> medicineNotTakenMap = new HashMap<>();
+        Map<String,Integer> improperTimeMedicine = new HashMap<>();
+        Map<String,Integer> skippedMedicine = new HashMap<>();
+        for(Medication m : treatment.getMedication()) {
+            Map<Long, Boolean> medicineNotTaken = new HashMap<>();
+            BackgroundService.subscribeToTopic(m.getMedicineId());
+            improperTimeMedicine.put(m.getMedicineId(),0);
+            skippedMedicine.put(m.getMedicineId(),0);
+            for(String time : m.getTimeThreshold()) {
+                int hour, minute;
+                String[] tokens = time.split(":");
+                String ampm = tokens[1].substring(tokens[1].length()-2);
+                Log.d("Debug", ampm);
+                if(ampm.equals("AM"))
+                {
+                    hour = Integer.parseInt(tokens[0]);
+                    if(hour==12)
+                        hour = 0;
+                }
+                else
+                    hour = 12+Integer.parseInt((tokens[0]));
+                minute = Integer.parseInt(tokens[1].substring(0,tokens[1].length()-2).replaceAll("\\s+",""));
+                Log.d("Debug", "Hour : "+hour);
+                Log.d("Debug", "Minute : "+minute);
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(Calendar.HOUR_OF_DAY, hour);
+                calendar.set(Calendar.MINUTE, minute);
+                calendar.set(Calendar.SECOND, 0);
+
+                Long time1 = calendar.getTimeInMillis();
+                Log.d("Debug","Putting "+ time1 + " to true");
+                medicineNotTaken.put(time1,true);
+
+                AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                PendingIntent pendingIntent;
+                Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+                alarmIntent.putExtra("medicine", m.getMedicineId());
+                alarmIntent.putExtra("time", time1.toString());
+                Log.d("Debug", "Putting extra "+time1);
+                pendingIntent = PendingIntent.getBroadcast(this, intentId, alarmIntent, 0);
+                intentId++;
+                manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, time1, AlarmManager.INTERVAL_DAY, pendingIntent);
+                Log.d("Debug","Alarm for medicine "+ m.getMedicineId()+ " and time "+ time1 + " is set");
+            }
+            medicineNotTakenMap.put(m.getMedicineId(),medicineNotTaken);
+        }
+        BackgroundService.subscription.setMedicineNotTakenMap(medicineNotTakenMap);
+        BackgroundService.subscription.setImproperTimeMedicine(improperTimeMedicine);
+        BackgroundService.subscription.setSkippedMedicine(skippedMedicine);
+        ObjectMapper subscMapper = new ObjectMapper();
+        String subscStr = null;
+        try {
+            subscStr = subscMapper.writeValueAsString(BackgroundService.subscription);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        Log.d("Debug", subscStr);
+        SharedPreferences settings = getSharedPreferences("myPref", 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("subscription", subscStr);
+        // Commit the edits!
+        editor.commit();
     }
 }

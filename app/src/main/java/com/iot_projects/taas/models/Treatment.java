@@ -94,4 +94,15 @@ public class Treatment {
         this.additionalProperties.put(name, value);
     }
 
+    @Override
+    public String toString() {
+        return "Treatment{" +
+                "duration=" + duration +
+                ", medication=" + medication +
+                ", restrictedFood=" + restrictedFood +
+                ", dangerSigns=" + dangerSigns +
+                ", sleep=" + sleep +
+                ", additionalProperties=" + additionalProperties +
+                '}';
+    }
 }

@@ -55,4 +55,12 @@ public class DangerSign {
         this.additionalProperties.put(name, value);
     }
 
+    @Override
+    public String toString() {
+        return "DangerSign{" +
+                "symptom='" + symptom + '\'' +
+                ", whenToAlert=" + whenToAlert +
+                ", additionalProperties=" + additionalProperties +
+                '}';
+    }
 }
