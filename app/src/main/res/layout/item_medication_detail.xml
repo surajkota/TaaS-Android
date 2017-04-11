@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="medication"
+            type="com.iot_projects.taas.models.Medication" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp">
+
+        <ImageView
+            android:id="@+id/pillImageView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/vector_pill_dark" />
+
+        <TextView
+            android:id="@+id/medicineDetailNameText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_toEndOf="@+id/pillImageView"
+            android:text="Crocin"
+            android:textColor="@color/textBlack"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/medicineDetailQtyText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/medicineDetailNameText"
+            android:layout_below="@+id/medicineDetailNameText"
+            android:text="@{Integer.toString(medication.quantity)+ ' ' + 'X' + ' ' + Integer.toString(medication.frequency) + ' ' + @string/med_freq_part}" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/medicineDetailNameText"
+            android:layout_below="@+id/medicineDetailQtyText"
+            android:layout_marginTop="2dp"
+            android:text="@{medication.procedure}" />
+
+    </RelativeLayout>
+</layout>
