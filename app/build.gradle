@@ -38,13 +38,16 @@ ext {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile "com.android.support:appcompat-v7:${supportLibVersion}"
     compile "com.android.support:design:${supportLibVersion}"
     compile "com.android.support:cardview-v7:${supportLibVersion}"
+    compile project(':fitbitapi')
+    compile project(':fitbitauth')
+    compile project(':fitbitcommon')
     compile 'com.fasterxml.jackson.core:jackson-core:2.7.3'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.7.3'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.3'
@@ -54,5 +57,6 @@ dependencies {
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.squareup.retrofit2:retrofit:2.2.0'
     compile 'com.squareup.retrofit2:converter-jackson:2.2.0'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
 }

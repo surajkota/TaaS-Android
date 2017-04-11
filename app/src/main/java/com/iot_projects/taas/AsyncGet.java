@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.RestrictTo;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -15,9 +16,15 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fitbit.authentication.AuthenticationConfiguration;
+import com.fitbit.authentication.AuthenticationConfigurationBuilder;
+import com.fitbit.authentication.AuthenticationManager;
+import com.fitbit.authentication.ClientCredentials;
+import com.fitbit.authentication.Scope;
 import com.iot_projects.taas.models.DangerSign;
 import com.iot_projects.taas.models.Medication;
 import com.iot_projects.taas.models.Treatment;
+import com.iot_projects.taas.util.Constants;
 
 import java.io.IOException;
 import java.net.URL;
@@ -161,5 +168,19 @@ public class AsyncGet extends Thread {
         editor.putString("subscription", subscStr);
         // Commit the edits!
         editor.commit();
+
+        if(treatment.getSleep()!=null)
+        {
+            Log.d("Debug", "Sleep is included!");
+            loginToFitBit();
+        }
+    }
+
+    void loginToFitBit()
+    {
+        Intent loginIntent = new Intent();
+        loginIntent.setClass(context, FitbitLogin.class);
+        loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+        context.startActivity(loginIntent);
     }
 }

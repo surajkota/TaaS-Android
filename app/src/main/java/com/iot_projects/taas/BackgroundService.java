@@ -50,7 +50,7 @@ public class BackgroundService extends Application implements BootstrapNotifier,
     public static Subscription subscription = new Subscription();
     static MqttAndroidClient mqttAndroidClient;
     private Map<String,String> uidToUrl = new HashMap<>();
-    Map<String, Interval> foodNearBy;
+    Map<String, Interval> foodNearBy = new HashMap<>();
     Map<String, Long> foodTimeStamp;
 
     final String serverUri = Constants.brokerURL;

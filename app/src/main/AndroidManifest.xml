@@ -48,7 +48,9 @@
         <receiver
             android:name=".SideEffectsReceiver"
             android:enabled="true"
-            android:exported="true"></receiver>
+            android:exported="true" />
+
+        <activity android:name=".FitbitLogin"></activity>
     </application>
 
 </manifest>
