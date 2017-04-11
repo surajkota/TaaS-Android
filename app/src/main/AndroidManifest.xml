@@ -27,9 +27,11 @@
             android:theme="@style/AppThemeNoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".TreatmentDetailActivity" />
 
         <service android:name="org.eclipse.paho.android.service.MqttService" />
 
@@ -37,10 +39,14 @@
 
         <activity
             android:name=".ReadTheMessage"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <receiver
             android:name=".SkippedMedicineReceiver"
+            android:enabled="true"
+            android:exported="true" />
+        <receiver
+            android:name=".SideEffectsReceiver"
             android:enabled="true"
             android:exported="true"></receiver>
     </application>

@@ -13,15 +13,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "treatmentName",
-        "duration",
-        "medication",
-        "restrictedFood",
-        "dangerSigns",
-        "sleep"
-})
 public class Treatment implements Serializable {
 
     @JsonProperty("duration")
@@ -118,6 +109,7 @@ public class Treatment implements Serializable {
                 ", restrictedFood=" + restrictedFood +
                 ", dangerSigns=" + dangerSigns +
                 ", sleep=" + sleep +
+                ", treatmentName='" + treatmentName + '\'' +
                 ", additionalProperties=" + additionalProperties +
                 '}';
     }

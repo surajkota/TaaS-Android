@@ -1,15 +1,16 @@
 package com.iot_projects.taas;
 
 import android.content.Context;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.iot_projects.taas.databinding.CardSubscribeTreatmentBinding;
 import com.iot_projects.taas.models.Treatment;
+import com.iot_projects.taas.util.Constants;
 
 import java.util.List;
 
@@ -41,7 +42,9 @@ public class SubscribeRecyclerAdapter extends RecyclerView.Adapter<SubscribeRecy
         holder.cardSubscribeTreatmentBinding.subscribeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Log.d("Debug", "Subscribe Button Clicked!");
+                AsyncGet asyncGet = new AsyncGet(Constants.baseURL+"getTDL", context );
+                asyncGet.start();
             }
         });
     }

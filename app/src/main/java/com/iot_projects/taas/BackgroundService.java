@@ -2,20 +2,23 @@ package com.iot_projects.taas;
 
 import android.app.Application;
 import android.content.SharedPreferences;
+import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iot_projects.taas.models.Interval;
 import com.iot_projects.taas.models.Medication;
 import com.iot_projects.taas.models.Subscription;
 import com.iot_projects.taas.models.Treatment;
+import com.iot_projects.taas.util.Constants;
 
+import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
+import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 import org.altbeacon.beacon.startup.BootstrapNotifier;
 import org.altbeacon.beacon.startup.RegionBootstrap;
@@ -30,57 +33,54 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
  * Created by adhit on 4/6/2017.
  */
 
-public class BackgroundService extends Application implements BootstrapNotifier, BeaconConsumer {
+public class BackgroundService extends Application implements BootstrapNotifier, BeaconConsumer, RangeNotifier {
     private static final String TAG = "BackgroundScan";
     private RegionBootstrap regionBootstrap;
     private BeaconManager mBeaconManager;
-    private String postAddress = "http://192.168.0.10:8080/";
+    private String postAddress = Constants.baseURL;
     Region regions[];
     public static Subscription subscription = new Subscription();
     static MqttAndroidClient mqttAndroidClient;
+    private Map<String,String> uidToUrl = new HashMap<>();
+    Map<String, Interval> foodNearBy;
+    Map<String, Long> foodTimeStamp;
 
-    final String serverUri = "tcp://192.168.0.10:1883";
+    final String serverUri = Constants.brokerURL;
 
     String clientId = "ExampleAndroidClient";
 
+    @Override
     public void onCreate() {
 
         super.onCreate();
         mBeaconManager = org.altbeacon.beacon.BeaconManager.getInstanceForApplication(this);
         mBeaconManager.getBeaconParsers().clear();
-
-        //set Beacon Layout for iBeacon packet
-        /*mBeaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));*/
-        //set Beacon Layout for Eddystone-UID packet
-        mBeaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_UID_LAYOUT));
-
+        // Detect the main Eddystone-UID frame:
+        mBeaconManager.getBeaconParsers().add(new BeaconParser().
+                setBeaconLayout(BeaconParser.EDDYSTONE_UID_LAYOUT));
+        // Detect the telemetry Eddystone-TLM frame:
+        mBeaconManager.getBeaconParsers().add(new BeaconParser().
+                setBeaconLayout(BeaconParser.EDDYSTONE_TLM_LAYOUT));
         //set period of scan in background and foreground. In every period 'didRangeBeaconsInRegion' callback is called
-        mBeaconManager.setForegroundScanPeriod(3000);
-        mBeaconManager.setForegroundBetweenScanPeriod(500);
-        mBeaconManager.setBackgroundScanPeriod(3000);
-        mBeaconManager.setBackgroundBetweenScanPeriod(1000);
+        mBeaconManager.setForegroundScanPeriod(2500);
+        mBeaconManager.setForegroundBetweenScanPeriod(10000);
+        mBeaconManager.setBackgroundScanPeriod(2500);
+        mBeaconManager.setBackgroundBetweenScanPeriod(10000);
         BeaconManager.setAndroidLScanningDisabled(true);
-
-
-        regions = new Region[4];
-        //With "new Region" you are adding the beacon identifier to the list that will be checked in every Scan Period
-        //To add iBeacon region it's necessary to pass as parameters --> (uniqueId = region name, id1=uuid, id2 = major, id3 = minor)
-        regions[0] = new Region("area1", Identifier.parse("0x10101010101010101010"), Identifier.parse("0x101010101000"), null);
-        //To add Eddystone-UID region it's necessary to pass as parameters --> (uniqueId = region name, id1=namespace, id2 = instance, id3 = null)
-        regions[1] = new Region("area2", Identifier.parse("0x10101010101010101010"), Identifier.parse("0x101010101001"), null);
-        regions[2] = new Region("area3", Identifier.parse("0x10101010101010101010"), Identifier.parse("0x101010101010"), null);
-        regions[3] = new Region("area4", Identifier.parse("0x10101010101010101010"), Identifier.parse("0x101010101011"), null);
-
         mBeaconManager.bind(this);
+
+        uidToUrl.put("0x101010101000", "food1");
+        uidToUrl.put("0x101010101001", "food2");
+        uidToUrl.put("0x101010101010", "food3");
+        uidToUrl.put("0x101010101011", "food4");
 
         clientId = clientId + System.currentTimeMillis();
 
@@ -96,7 +96,7 @@ public class BackgroundService extends Application implements BootstrapNotifier,
                     String s = "";
                     SharedPreferences settings = getSharedPreferences("myPref", 0);
                     if(settings.contains("subscription"))
-                        s = settings.getString("subscription", "hi");
+                        s = settings.getString("subscription", "");
                     Log.d("Debug", s);
                     if(!s.equals(""))
                     {
@@ -153,6 +153,7 @@ public class BackgroundService extends Application implements BootstrapNotifier,
                                 subscription.getImproperTimeMedicine().put(topic, notProperTime+1);
                                 if((notProperTime+1)>=5)
                                 {
+                                    //TODO Report to doctor on irregular medicine intake. Send post request to baseUrl/medicineIrregular with subscription id and medicine name as payload
                                     Toast.makeText(BackgroundService.this, "Medicine " + topic + " is taken irregularly more than 5 times!", Toast.LENGTH_SHORT).show();
                                 }
                             }
@@ -238,69 +239,67 @@ public class BackgroundService extends Application implements BootstrapNotifier,
         }
     }
 
-    public void enableRegions() {
-        try {
-
-            if (regionBootstrap == null) {
-                List<Region> list = new ArrayList<>();
-                for (int i = 0; i < regions.length; i++) {
-                    if (regions[i] != null) {
-                        list.add(regions[i]);
-                    }
-                }
-                regionBootstrap = new RegionBootstrap(this, list);
-            }
-
-            for (int i = 0; i < regions.length; i++) {
-                if (regions[i] != null) {
-                    mBeaconManager.startRangingBeaconsInRegion(regions[i]);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void disableRegions() {
-        try {
-            if (regionBootstrap != null)
-                regionBootstrap.disable();
-            regionBootstrap = null;
-
-            for (int i = 0; i < regions.length; i++) {
-                if (regions[i] != null) {
-                    mBeaconManager.stopRangingBeaconsInRegion(regions[i]);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void onBeaconServiceConnect() {
-        enableRegions();
+        Log.d("Debug", "Enabling region here!");
+        Region region = new Region("all-beacons-region", Identifier.parse("0x10101010101010101010"), null, null);
+        try {
+            mBeaconManager.startRangingBeaconsInRegion(region);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        mBeaconManager.addRangeNotifier(this);
     }
 
     @Override
-    public void didEnterRegion(Region region) {
-        Log.d(TAG, "Beacon enters with namespace id " + region.getId1() +" and instance id: " + region.getId2().toString());
-        Log.d(TAG, "Sending post request to node!");
-        AsyncPost asyncPost = new AsyncPost(postAddress+"incrementCounter", region.getId2().toString());
-        asyncPost.execute();
+    public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+        for (Beacon beacon: beacons) {
+            Log.d("Debug", beacon.getId1().toString());
+            if (beacon.getServiceUuid() == 0xfeaa && beacon.getBeaconTypeCode() == 0x00) {
+                // This is a Eddystone-UID frame
+                Identifier namespaceId = beacon.getId1();
+                Identifier instanceId = beacon.getId2();
+
+                Log.d("Debug", "Beacon enters with namespace id " + namespaceId + " and instance id: " + instanceId + " at a distance "+beacon.getDistance());
+
+                String food = "";
+                if(uidToUrl.containsKey(instanceId.toString()))
+                        food = uidToUrl.get(instanceId.toString());
+                if(!food.equals(""))
+                {
+                    if(foodNearBy.containsKey(food))
+                    {
+                        Long timeNow = System.currentTimeMillis();
+                        if(timeNow-foodNearBy.get(food).getEndTime() > 300000)
+                        {
+                            Log.d("Debug", "Initializing new food nearby!");
+                            foodNearBy.put(food,new Interval(timeNow,timeNow));
+                        }
+                        else
+                        {
+                            Interval interval = foodNearBy.get(food);
+                            interval.setEndTime(timeNow);
+                            if(interval.getEndTime() - interval.getStartTime() > 300000)
+                            {
+                                //TODO Get the ingredients of the food and check if restricted food is present in the ingredients.
+                                Log.d("Debug","Patient near restricted food " + food + " for more than 5 minutes!");
+                                //TODO Report to doctor! Alert the patient of wrong eating habit.
+                                AsyncPost asyncPost = new AsyncPost(postAddress + "restrictedFood", instanceId.toString());
+                                asyncPost.execute();
+                                interval.setStartTime(timeNow);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
+    @Override
+    public void didEnterRegion(Region region) {}
 
     @Override
-    public void didExitRegion(Region region) {
-
-        Log.d(TAG, "Beacon out of region with namespace id " + region.getId1() +" and instance id: " + region.getId2());
-        AsyncPost asyncPost = new AsyncPost(postAddress+"decrementCounter", region.getId2().toString());
-        asyncPost.execute();
-    }
+    public void didExitRegion(Region region) {}
 
     @Override
-    public void didDetermineStateForRegion(int i, Region region) {
-        //Ignore
-    }
+    public void didDetermineStateForRegion(int i, Region region) {}
 }

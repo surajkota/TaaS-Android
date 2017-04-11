@@ -18,6 +18,19 @@ public class Subscription {
     @JsonProperty("skippedMedicine")
     private Map<String, Integer> skippedMedicine = new HashMap<>();
 
+    /*@JsonProperty("foodNearBy")
+    private Map<String, Interval> foodNearBy = new HashMap<>();
+
+    @JsonProperty("foodNearBy")
+    public Map<String, Interval> getFoodNearBy() {
+        return foodNearBy;
+    }
+
+    @JsonProperty("foodNearBy")
+    public void setFoodNearBy(Map<String, Interval> foodNearBy) {
+        this.foodNearBy = foodNearBy;
+    }*/
+
     @JsonProperty("improperTimeMedicine")
     public Map<String, Integer> getImproperTimeMedicine() {
         return improperTimeMedicine;
@@ -58,11 +71,15 @@ public class Subscription {
     {
         return medicineNotTakenMap;
     }
+
     @Override
     public String toString() {
         return "Subscription{" +
                 "treatment=" + treatment +
                 ", medicineNotTakenMap=" + medicineNotTakenMap +
+                ", improperTimeMedicine=" + improperTimeMedicine +
+                ", skippedMedicine=" + skippedMedicine +
+                //", foodNearBy=" + foodNearBy +
                 '}';
     }
 }

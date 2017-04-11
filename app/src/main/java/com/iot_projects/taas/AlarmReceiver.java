@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iot_projects.taas.models.Subscription;
@@ -28,9 +27,9 @@ public class AlarmReceiver extends BroadcastReceiver {
             String s = "";
             SharedPreferences settings = context.getSharedPreferences("myPref", 0);
             if (settings.contains("subscription"))
-                s = settings.getString("subscription", "hi");
+                s = settings.getString("subscription", "");
             //Toast.makeText(context, medicine + " " + time, Toast.LENGTH_SHORT).show();
-            if(!s.equals("hi")) {
+            if(!s.equals("")) {
                 Log.d("Debug", medicine + " " + time);
                 ObjectMapper objectMapper = new ObjectMapper();
                 try {
@@ -53,6 +52,8 @@ public class AlarmReceiver extends BroadcastReceiver {
                                 pendingIntent = PendingIntent.getBroadcast(context, random.nextInt(), alarmIntent, 0);
                                 manager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 60000, pendingIntent);
                                 Log.d("Debug", "Final Alarm for medicine " + medicine + " is set");
+
+                                //TODO Show medicine reminder notification here
                                 Intent speechIntent = new Intent();
                                 speechIntent.setClass(context, ReadTheMessage.class);
                                 speechIntent.putExtra("MESSAGE", "Medicine reminder!");
@@ -67,7 +68,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             }
         }
         else {
-            Toast.makeText(context, String.valueOf(time), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, String.valueOf(time), Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -12,18 +12,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-    "medicineId",
-    "timeThreshold",
-    "quantity",
-    "procedure",
-    "frequency",
-    "startDay",
-    "endDay"
-})
 public class Medication implements Serializable {
 
+    @JsonProperty("medicineName")
+    public String medicineName;
     @JsonProperty("medicineId")
     public String medicineId;
     @JsonProperty("timeThreshold")
@@ -41,6 +33,10 @@ public class Medication implements Serializable {
     @JsonIgnore
     public Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+    @JsonProperty("medicineName")
+    public String getMedicineName() { return medicineName; }
+    @JsonProperty("medicineName")
+    public void setMedicineName(String name) { this.medicineName = name; }
     @JsonProperty("medicineId")
     public String getMedicineId() {
         return medicineId;
@@ -124,7 +120,8 @@ public class Medication implements Serializable {
     @Override
     public String toString() {
         return "Medication{" +
-                "medicineId='" + medicineId + '\'' +
+                "medicineName='" + medicineName + '\'' +
+                ", medicineId='" + medicineId + '\'' +
                 ", timeThreshold=" + timeThreshold +
                 ", quantity=" + quantity +
                 ", procedure='" + procedure + '\'' +

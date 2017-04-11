@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iot_projects.taas.models.Subscription;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class SkippedMedicineReceiver extends BroadcastReceiver {
 
@@ -41,9 +40,10 @@ public class SkippedMedicineReceiver extends BroadcastReceiver {
                 editor.putString("subscription", subsStr);
                 Log.d("Debug", subsStr);
                 editor.commit();
-                if((skippedMedicine+1)>=5)
+                if((skippedMedicine+1)>=5) {
+                    //TODO Report to doctor (Post request to baseUrl/medicineSkip with subscription id and medicine name as payload
                     Toast.makeText(context, "Medicine " + medicine + " is skipped more than 5 times!", Toast.LENGTH_SHORT).show();
-
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
