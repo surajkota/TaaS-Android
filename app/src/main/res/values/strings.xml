@@ -4,9 +4,11 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="subscribe_button">Subscribe</string>
+    <string name="unsubscribe_button">Unsubscribe</string>
     <string name="subscribe_activity_title">Subscriptions</string>
     <string name="treatments_activity_title">Treatments</string>
     <string name="medication_label">Medication</string>
+    <string name="treatments_label">Treatments</string>
     <string name="restricted_food_label">Restricted Food</string>
     <string name="danger_sign_label">Danger Signs</string>
     <string name="med_freq_part">times a day</string>
@@ -17,4 +19,5 @@
     <string name="drawer_close">Close navigation drawer</string>
     <string name="noti_no">No</string>
     <string name="noti_yes">Yes</string>
+    <string name="sub_edittext_hint">Subscription ID</string>
 </resources>

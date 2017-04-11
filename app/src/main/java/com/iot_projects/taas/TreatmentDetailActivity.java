@@ -37,14 +37,14 @@ public class TreatmentDetailActivity extends AppCompatActivity {
             }
 
             if (treatment.getDangerSigns() != null && !treatment.getDangerSigns().isEmpty()) {
-                treatmentDetailBinding.dangerDetailRecyclerView.setLayoutManager(new GridLayoutManager(this, 2, LinearLayoutManager.HORIZONTAL, false));
+                treatmentDetailBinding.dangerDetailRecyclerView.setLayoutManager(new LinearLayoutManager(this));
                 treatmentDetailBinding.dangerDetailRecyclerView.setAdapter(new DangerSignRecyclerAdapter(treatment.getDangerSigns()));
             } else {
                 treatmentDetailBinding.dangerDetailCardView.setVisibility(View.GONE);
             }
 
             if (treatment.getRestrictedFood() != null && !treatment.getRestrictedFood().isEmpty()) {
-                treatmentDetailBinding.restrictedDetailRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+                treatmentDetailBinding.restrictedDetailRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
                 treatmentDetailBinding.restrictedDetailRecyclerView.setAdapter(new RestrictedFoodRecyclerAdapter(treatment.getRestrictedFood()));
             } else {
                 treatmentDetailBinding.restrictedDetailCardView.setVisibility(View.GONE);

@@ -4,14 +4,10 @@
         <item
             android:id="@+id/nav_first_fragment"
             android:icon="@drawable/vector_pill_dark"
-            android:title="@string/medication_label" />
+            android:title="@string/treatments_label" />
         <item
             android:id="@+id/nav_second_fragment"
             android:icon="@drawable/vector_subscription_dark"
             android:title="@string/subscriptions_side" />
-        <item
-            android:id="@+id/nav_third_fragment"
-            android:icon="@drawable/vector_profile_dark"
-            android:title="@string/user_side" />
     </group>
 </menu>
