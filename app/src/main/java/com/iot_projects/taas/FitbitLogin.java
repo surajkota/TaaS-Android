@@ -4,7 +4,10 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.fitbit.api.models.SleepLog;
+import com.fitbit.api.services.SleepService;
 import com.fitbit.authentication.AuthenticationConfiguration;
 import com.fitbit.authentication.AuthenticationConfigurationBuilder;
 import com.fitbit.authentication.AuthenticationHandler;
@@ -12,7 +15,11 @@ import com.fitbit.authentication.AuthenticationManager;
 import com.fitbit.authentication.AuthenticationResult;
 import com.fitbit.authentication.ClientCredentials;
 import com.fitbit.authentication.Scope;
+import com.google.gson.Gson;
 import com.iot_projects.taas.util.Constants;
+
+import java.util.Calendar;
+import java.util.Date;
 
 public class FitbitLogin extends AppCompatActivity implements AuthenticationHandler {
 
@@ -21,7 +28,6 @@ public class FitbitLogin extends AppCompatActivity implements AuthenticationHand
         super.onCreate(savedInstanceState);
         ClientCredentials clientCredentials = new ClientCredentials(Constants.clientId, Constants.clientSecret, Constants.callbackUrl);
         String secureKey = Constants.secureKey;
-
         AuthenticationConfiguration config = new AuthenticationConfigurationBuilder()
                 .setClientCredentials(clientCredentials)
                 .setEncryptionKey(secureKey)
@@ -42,8 +48,10 @@ public class FitbitLogin extends AppCompatActivity implements AuthenticationHand
     public void onAuthFinished(AuthenticationResult result) {
         if (result.isSuccessful()) {
             Log.d("Debug","Authentication successful!");
+            Toast.makeText(this, "Authorization successful", Toast.LENGTH_SHORT);
         } else {
             Log.d("Debug","Authentication failed! "+ result);
+            Toast.makeText(this, "Authorization failed", Toast.LENGTH_SHORT);
         }
         finish();
     }
