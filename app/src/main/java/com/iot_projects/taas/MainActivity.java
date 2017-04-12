@@ -82,9 +82,6 @@ public class MainActivity extends AppCompatActivity {
             case R.id.nav_second_fragment:
                 fragmentClass = SubscribeFragment.class;
                 break;
-            case R.id.nav_third_fragment:
-                fragmentClass = TreatmentsFragment.class;
-                break;
             default:
                 fragmentClass = TreatmentsFragment.class;
         }

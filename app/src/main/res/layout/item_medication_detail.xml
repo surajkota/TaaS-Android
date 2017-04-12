@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_toEndOf="@+id/pillImageView"
-            android:text="Crocin"
+            android:text="@{medication.medicineName}"
             android:textColor="@color/textBlack"
             android:textSize="18sp" />
 
